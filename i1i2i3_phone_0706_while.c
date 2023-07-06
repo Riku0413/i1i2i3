@@ -9,7 +9,7 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <pthread.h>
-#define N 1024
+#define N 16384
 
 int main(int argc, char *argv[]) {
     if (argc > 3) {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
     // コマンドの出力を読み取り、クライアントに送信
     while (1) {
         n = fread(data, 1, sizeof(data), pipe);
-        if (send(s, data, N, 0) < 0) {
+        if (send(s, data, n, 0) < 0) {
             perror("send"); pclose(pipe); close(s); exit(1);
         }
 
