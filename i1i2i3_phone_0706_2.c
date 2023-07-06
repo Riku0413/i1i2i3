@@ -11,69 +11,6 @@
 #include <pthread.h>
 #define N 1024
 
-
-
-
-
-void* send_voice(void* arg) {
-    int s = *(int*)arg;
-    // printf("Thread %d is running\n", thread_id);
-
-    // クライアントとの通信処理をここに追加
-    FILE *pipe = popen("rec -t raw -b 16 -c 1 -e s -r 44100 -", "r");
-    if (pipe == NULL) {
-        perror("popen");
-        close(s);
-        return 1;
-    }
-
-    char data[N];
-    ssize_t n;
-
-    // コマンドの出力を読み取り、クライアントに送信
-    while ((n = fread(data, 1, sizeof(data), pipe)) > 0) {
-        if (send(s, data, N, 0) < 0) {
-            perror("send");
-            pclose(pipe);
-            close(s);
-            return 1;
-        }
-    }
-    pclose(pipe);
-
-    return NULL;
-}
-
-void* receive_voice(void* arg) {
-    int s = *(int*)arg;
-
-    FILE *playpipe = popen("play -t raw -b 16 -c 1 -e signed -r 44100 -", "w");
-    if (playpipe == NULL) {
-        perror("popen");
-        exit(1);
-    }
-
-    char data_2[N];
-
-    while (1) {
-        ssize_t recv_len = recv(s, data_2, N, 0);
-        if (recv_len < 0) {
-            perror("recv");
-            break;
-        } else if (recv_len == 0) {
-            printf("Server closed the connection\n");
-            break;
-        } else {
-            // 受信したデータをリアルタイムで出力する（音声再生）
-            fwrite(data_2, sizeof(char), recv_len, playpipe);
-        }
-    }
-    pclose(playpipe);
-
-    return NULL;
-}
-
-
 int main(int argc, char *argv[]) {
     if (argc > 3) {
         printf("Usage: %s <port> or %s <IP> <port>\n", argv[0], argv[0]);
@@ -153,18 +90,51 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // send
+    FILE *pipe = popen("rec -t raw -b 16 -c 1 -e s -r 44100 -", "r");
+    if (pipe == NULL) {
+        perror("popen1");
+        close(s);
+        return 1;
+    }
+    char data[N];
+    ssize_t n;
 
+    // receive
+    FILE *playpipe = popen("play -t raw -b 16 -c 1 -e signed -r 44100 -", "w");
+    if (playpipe == NULL) {
+        perror("popen2");
+        exit(1);
+    }
+    char data_2[N];
+    ssize_t n_2;
 
+    // コマンドの出力を読み取り、クライアントに送信
+    while (1) {
+        n = fread(data, 1, sizeof(data), pipe);
+        if (send(s, data, N, 0) < 0) {
+            perror("send");
+            pclose(pipe);
+            close(s);
+            return 1;
+        }
 
-    //
-    pthread_t thread1, thread2;
-    // スレッドの作成
-    pthread_create(&thread1, NULL, send_voice, &s);
-    pthread_create(&thread2, NULL, receive_voice, &s);
-    // スレッドの終了を待つ
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
-    //
+        n_2 = recv(s, data_2, N, 0);
+        if (n_2 < 0) {
+            perror("recv");
+            break;
+        } else if (n_2 == 0) {
+            printf("Server closed the connection\n");
+            break;
+        } else {
+            // 受信したデータをリアルタイムで出力する（音声再生）
+            fwrite(data_2, sizeof(char), n_2, playpipe);
+        }
+
+    }
+
+    pclose(pipe);
+    pclose(playpipe);
 
     close(s);
     close(ss);
