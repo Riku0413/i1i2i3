@@ -112,7 +112,7 @@ void print_complex(FILE * wp, complex double * Y, long n) {
   }
 }
 
-int FFT(long n, long f_1, long f_2) {
+int FFT(long n, long f_1, long f_2, char data[]) { // 修正
 
   if (!pow2check(n)) {
     fprintf(stderr, "error : n (%ld) not a power of two\n", n);
@@ -120,15 +120,15 @@ int FFT(long n, long f_1, long f_2) {
   }
   FILE * wp = fopen("fft.dat", "wb");
   if (wp == NULL) die("fopen");
-  sample_t * buf = calloc(sizeof(sample_t), n);
+  // sample_t * buf = calloc(sizeof(sample_t), n);
   complex double * X = calloc(sizeof(complex double), n);
   complex double * Y = calloc(sizeof(complex double), n);
   while (1) {
     /* 標準入力からn個標本を読む */
-    ssize_t m = read_n(0, n * sizeof(sample_t), buf);
-    if (m == 0) break;
+    // ssize_t m = read_n(0, n * sizeof(sample_t), buf);
+    // if (m == 0) break;
     /* 複素数の配列に変換 */
-    sample_to_complex(buf, X, n);
+    sample_to_complex(data, X, n); // 修正
     /* FFT -> Y */
     fft(X, Y, n);
 
@@ -145,9 +145,9 @@ int FFT(long n, long f_1, long f_2) {
     /* IFFT -> Z */
     ifft(Y, X, n);
     /* 標本の配列に変換 */
-    complex_to_sample(X, buf, n);
+    complex_to_sample(X, data, n); // 修正
     /* 標準出力へ出力 */
-    write_n(1, m, buf);
+    write_n(1, n, data); // 修正
   }
   fclose(wp);
   return 0;
