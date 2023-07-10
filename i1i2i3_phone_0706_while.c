@@ -20,6 +20,7 @@ int main(int argc, char *argv[]) {
     int s;
     int ss;
 
+    // サーバ側の処理
     if (argc == 2) {
         int port = atoi(argv[1]);
 
@@ -34,7 +35,7 @@ int main(int argc, char *argv[]) {
 
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(port);
-        serv_addr.sin_addr.s_addr = INADDR_ANY; // どこにでもいいの意
+        serv_addr.sin_addr.s_addr = INADDR_ANY; // 「どこにでもいい」の意
 
         if (bind(ss, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
             perror("bind"); close(ss); exit(1);
@@ -57,10 +58,10 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    else if (argc == 3) {
-        // ソケットの作成
-        s = socket(PF_INET, SOCK_STREAM, 0);
 
+    // クライアント側の処理
+    else if (argc == 3) {
+        s = socket(PF_INET, SOCK_STREAM, 0);
         if (s == -1) {
             perror("socket"); exit(1);
         }
@@ -70,9 +71,9 @@ int main(int argc, char *argv[]) {
         memset(&addr, 0, sizeof(addr)); // メモリ確保
         addr.sin_family = AF_INET; // IPv4
         addr.sin_port = htons(atoi(argv[2])); // ポート
-        if (inet_pton(AF_INET, argv[1], &(addr.sin_addr)) <= 0) {
+        if (inet_pton(AF_INET, argv[1], &(addr.sin_addr)) <= 0) {  // IPアドレス
             perror("inet_pton"); exit(1);
-        }; // IPアドレス
+        };
 
         // 接続
         if (connect(s, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -80,15 +81,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // send
-    FILE *pipe = popen("rec -t raw -b 16 -c 1 -e s -r 44100 -", "r");
-    if (pipe == NULL) {
+    // 送信の準備
+    FILE *recpipe = popen("rec -t raw -b 16 -c 1 -e s -r 44100 -", "r");
+    if (recpipe == NULL) {
         perror("popen1"); close(s); exit(1);
     }
     char data[N];
     ssize_t n;
 
-    // receive
+    // 受信の準備
     FILE *playpipe = popen("play -t raw -b 16 -c 1 -e signed -r 44100 -", "w");
     if (playpipe == NULL) {
         perror("popen2"); exit(1);
@@ -96,11 +97,10 @@ int main(int argc, char *argv[]) {
     char data_2[N];
     ssize_t n_2;
 
-    // コマンドの出力を読み取り、クライアントに送信
     while (1) {
-        n = fread(data, 1, sizeof(data), pipe);
+        n = fread(data, 1, sizeof(data), recpipe);
         if (send(s, data, n, 0) < 0) {
-            perror("send"); pclose(pipe); close(s); exit(1);
+            perror("send"); pclose(recpipe); close(s); exit(1);
         }
 
         n_2 = recv(s, data_2, N, 0);
@@ -109,12 +109,11 @@ int main(int argc, char *argv[]) {
         } else if (n_2 == 0) {
             printf("Server closed the connection\n"); exit(1);
         } else {
-            // 受信したデータをリアルタイムで出力する（音声再生）
             fwrite(data_2, sizeof(char), n_2, playpipe);
         }
     }
 
-    pclose(pipe);
+    pclose(recpipe);
     pclose(playpipe);
     close(s);
     close(ss);
