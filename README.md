@@ -48,3 +48,7 @@ githubのファイルをカレントディレクトリにインポート
 ## git status
 
 現在の編集状況を確認
+
+# コンパイル方法
+
+gcc i1i2i3_phone_0710_while_fft.c fft.c -o i1i2i3_phone_0710_while_fft
