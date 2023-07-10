@@ -11,6 +11,8 @@
 #include <pthread.h>
 #define N 16384
 
+#include "fft.h"
+
 int main(int argc, char *argv[]) {
     if (argc > 3) {
         printf("Usage: %s <port> or %s <IP> <port>\n", argv[0], argv[0]);
@@ -99,7 +101,10 @@ int main(int argc, char *argv[]) {
 
     while (1) {
         n = fread(data, 1, sizeof(data), recpipe);
-        if (send(s, data, n, 0) < 0) {
+        // fft
+        int n_fft = FFT(n, 0, 20000);
+        //
+        if (send(s, data, n_fft, 0) < 0) {
             perror("send"); pclose(recpipe); close(s); exit(1);
         }
 
