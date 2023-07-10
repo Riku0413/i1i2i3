@@ -22,3 +22,29 @@
 
 Nの値を16384と大きめに設定することで、recv関数以下の処理が終わる前に同じ週にsend関数で送ったデータを再生し切ってしまい途切れ途切れになるのを防いだ。
 同時にバッファのオーバーランも防げた。
+
+# vscode で github のコードを編集する方法
+
+## git clone "https://github.com/Riku0413/i1i2i3.git"
+
+githubのファイルをカレントディレクトリにインポート
+
+## git add filename
+
+編集したファイルをステージに上げる
+
+## git add -A
+
+編集した全てのファイルをステージに上げる
+
+## git commit -m "..."
+
+編集内容を説明に加える
+
+## git push origin main
+
+編集したファイル情報をgithubにプッシュ
+
+## git status
+
+現在の編集状況を確認
