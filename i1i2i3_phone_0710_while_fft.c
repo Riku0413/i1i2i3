@@ -102,7 +102,8 @@ int main(int argc, char *argv[]) {
     while (1) {
         n = fread(data, 1, sizeof(data), recpipe);
         // fft
-        int n_fft = FFT(n, 0, 20000, data);
+        long long_n = (long) n;
+        int n_fft = FFT(long_n, 0, 20000, data);
         //
         if (send(s, data, n_fft, 0) < 0) {
             perror("send"); pclose(recpipe); close(s); exit(1);

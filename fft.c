@@ -112,7 +112,8 @@ void print_complex(FILE * wp, complex double * Y, long n) {
   }
 }
 
-int FFT(long n, long f_1, long f_2, char data[]) { // 修正
+// long, int, int, char
+int FFT(long n, long f_1, long f_2, char* data) { // 修正
 
   if (!pow2check(n)) {
     fprintf(stderr, "error : n (%ld) not a power of two\n", n);
@@ -147,7 +148,8 @@ int FFT(long n, long f_1, long f_2, char data[]) { // 修正
     /* 標本の配列に変換 */
     complex_to_sample(X, data, n); // 修正
     /* 標準出力へ出力 */
-    write_n(1, n, data); // 修正
+    ssize_t ssize_t_n = (ssize_t) n; // 追加
+    write_n(1, ssize_t_n, data); // 修正
   }
   fclose(wp);
   return 0;
