@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-typedef short sample_t;
+// typedef char sample_t;
 
 void die(char * s) {
   perror(s); 
@@ -40,13 +40,13 @@ ssize_t write_n(int fd, ssize_t n, void * buf) {
 }
 
 /* 標本(整数)を複素数へ変換 */
-void sample_to_complex(sample_t * s, complex double * X, long n) {
+void sample_to_complex(char * s, complex double * X, long n) {
   long i;
   for (i = 0; i < n; i++) X[i] = s[i];
 }
 
 /* 複素数を標本(整数)へ変換. 虚数部分は無視 */
-void complex_to_sample(complex double * X, sample_t * s, long n) {
+void complex_to_sample(complex double * X, char * s, long n) {
   long i;
   for (i = 0; i < n; i++) {
     s[i] = creal(X[i]);
@@ -113,7 +113,7 @@ void print_complex(FILE * wp, complex double * Y, long n) {
 }
 
 // long, int, int, char
-int FFT(long n, long f_1, long f_2, short* data) { // short型に変更
+int FFT(long n, long f_1, long f_2, char* data) { // short型に変更
 
   if (!pow2check(n)) {
     fprintf(stderr, "error : n (%ld) not a power of two\n", n);

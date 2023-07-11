@@ -11,7 +11,7 @@
 #include <pthread.h>
 #define N 16384
 
-#include "fft.h"
+#include "fft_0711.h"
 
 int main(int argc, char *argv[]) {
     if (argc > 3) {
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
     if (recpipe == NULL) {
         perror("popen1"); close(s); exit(1);
     }
-    short data[N]; // 型を変更
+    char data[N]; // 型を変更
     ssize_t n;
 
     // 受信の準備
@@ -96,16 +96,16 @@ int main(int argc, char *argv[]) {
     if (playpipe == NULL) {
         perror("popen2"); exit(1);
     }
-    short data_2[N]; // 型を変更
+    char data_2[N]; // 型を変更
     ssize_t n_2;
 
     while (1) {
         n = fread(data, 1, sizeof(data), recpipe);
         // fft
-        long long_n = (long) n;
-        int n_fft = FFT(long_n, 0, 20000, data);
+        // long long_n = (long) n;
+        // ssize_t n_fft = FFT(long_n, 0, 20000, data);
         //
-        if (send(s, data, n_fft, 0) < 0) {
+        if (send(s, data, n, 0) < 0) {
             perror("send"); pclose(recpipe); close(s); exit(1);
         }
 
@@ -115,7 +115,7 @@ int main(int argc, char *argv[]) {
         } else if (n_2 == 0) {
             printf("Server closed the connection\n"); exit(1);
         } else {
-            fwrite(data_2, sizeof(short), n_2, playpipe); // charをshortに変更
+            fwrite(data_2, sizeof(char), n_2, playpipe); // charをshortに変更
         }
     }
 
