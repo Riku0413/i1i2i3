@@ -76,3 +76,8 @@ gcc i1i2i3_phone_0710_while_fft.c fft.c -o i1i2i3_phone_0710_while_fft
 ```
 ./i1i2i3_phone_0710_while_fft <サーバのIPアドレス> <ポート番号>
 ```
+gcc i1i2i3_phone_0710_while_fft.c fft.c -o i1i2i3_phone_0710_while_fft
+#### 臨時！！！
+```
+gcc i1i2i3_phone_0711_while_fft.c fft_0711.c -o i1i2i3_phone_0711_while_fft
+```
