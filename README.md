@@ -33,6 +33,11 @@ Nの値を16384と大きめに設定することで、recv関数以下の処理�
 git clone "https://github.com/Riku0413/i1i2i3.git"
 ```
 
+### - 階層を移動
+```
+cd ./i1i2i3
+```
+
 ### - 編集したファイルをステージに上げる
 ```
 git add filename
