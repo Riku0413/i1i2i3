@@ -24,7 +24,7 @@ void* send_voice(void* arg) {
     if (pipe == NULL) {
         perror("popen");
         close(s);
-        return 1;
+        return NULL;
     }
 
     char data[N];
@@ -32,11 +32,11 @@ void* send_voice(void* arg) {
 
     // コマンドの出力を読み取り、クライアントに送信
     while ((n = fread(data, 1, sizeof(data), pipe)) > 0) {
-        if (send(s, data, N, 0) < 0) {
+        if (send(s, data, n, 0) < 0) { // 修正
             perror("send");
             pclose(pipe);
             close(s);
-            return 1;
+            return NULL;
         }
     }
     pclose(pipe);
