@@ -19,10 +19,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // ソケット用の変数用意
     int s;
     int ss;
 
-    // サーバ側の処理
+    // サーバ側の接続処理
     if (argc == 2) {
         int port = atoi(argv[1]);
 
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // クライアント側の処理
+    // クライアント側の接続処理
     else if (argc == 3) {
         s = socket(PF_INET, SOCK_STREAM, 0);
         if (s == -1) {
@@ -99,11 +100,12 @@ int main(int argc, char *argv[]) {
     short data_2[N]; // 型を変更
     ssize_t n_2;
 
+    // １つのループ内で音声の送受信を繰り返す
     while (1) {
         n = fread(data, sizeof(short), N, recpipe);
-        // FFT
+        // FFT → BPF → IFFT
         long long_n = (long) n;
-        *data = FFT(long_n, 300, 1000, data);
+        FFT(long_n, 300, 3000, data);
         //
         if (send(s, data, n * sizeof(short), 0) < 0) {
             perror("send"); pclose(recpipe); close(s); exit(1);

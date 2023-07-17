@@ -112,15 +112,16 @@ void print_complex(FILE * wp, complex double * Y, long n) {
   }
 }
 
-// long, int, int, char
-short* FFT(long n, long f_1, long f_2, short* data) { // short型に変更
+// FFT, BPF, IFFT の処理
+// raw形式の音声ファイルのポインタ data を受け取って 中身を BPF して書き換え、返り値はなし。
+void FFT(long n, long f_1, long f_2, short* data) { // short型に変更
 
   if (!pow2check(n)) {
     fprintf(stderr, "error : n (%ld) not a power of two\n", n);
     exit(1);
   }
-  FILE * wp = fopen("fft.dat", "wb");
-  if (wp == NULL) die("fopen");
+  // FILE * wp = fopen("fft.dat", "wb");
+  // if (wp == NULL) die("fopen");
   // sample_t * buf = calloc(sizeof(sample_t), n);
   complex double * X = calloc(sizeof(complex double), n);
   complex double * Y = calloc(sizeof(complex double), n);
@@ -156,7 +157,6 @@ short* FFT(long n, long f_1, long f_2, short* data) { // short型に変更
   // write_n(1, ssize_t_n*2, data); // 修正
   //
 
-
-  fclose(wp);
-  return data;
+  // fclose(wp);
+  // return data;
 }
